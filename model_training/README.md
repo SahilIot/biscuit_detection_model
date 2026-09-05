@@ -427,7 +427,7 @@ training/
 
 Main scripts:
 
-training/trainmodel.py
+training/train_model.py
 training/fine_tuning.py
 
 Before training, verify:
