@@ -1,0 +1,7 @@
+path: C:/Users/Sahil/Downloads/WelcomeScreen/biscuit_dataset
+train: images/train
+val: images/val
+
+names:
+  0: biscuit
+  1: empty_conveyor

@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment / secrets
+
+.env
+
+# Large video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Large model files
+*.pt
+*.onnx
+
+# Training outputs
+runs/
+models/runs/
+
+# Generated outputs
+outputs/*
+
+# Keep folder structure
+!outputs/.gitkeep
+!outputs/diagnostic_results/
+!outputs/diagnostic_results/.gitkeep
+
+# Local datasets / raw data
+data/raw_frames/*
+data/empty_frames/*
+data/videos/*
+
+# Keep folder structure
+!data/raw_frames/.gitkeep
+!data/empty_frames/.gitkeep
+!data/videos/.gitkeep
+
+
+# YOLO dataset images and labels
+# These are kept locally / in cloud storage, NOT GitHub
+data/biscuit_dataset/images/*
+data/biscuit_dataset/labels/*
+
+# Keep dataset directories
+!data/biscuit_dataset/images/
+!data/biscuit_dataset/labels/
+!data/biscuit_dataset/images/.gitkeep
+!data/biscuit_dataset/labels/.gitkeep
+
+
+# Keep YOLO dataset configuration in GitHub
+!data/biscuit_dataset/data.yaml
+
+# Temporary / local files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
