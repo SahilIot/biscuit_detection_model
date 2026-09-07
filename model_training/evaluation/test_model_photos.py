@@ -3,8 +3,8 @@ from pathlib import Path
 
 from ultralytics import YOLO
 import cv2
-import tkinter as tk
-from tkinter import filedialog
+import tkinter as tk # creating GUI for desktop application
+from tkinter import filedialog # display native file/directory selection
 import os
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -12,7 +12,7 @@ import config
 
 # CONFIGURATION (override MODEL_PATH in your .env)
 MODEL_PATH = config.MODEL_PATH
-CONFIDENCE = 0.30
+CONFIDENCE = 0.50
 IMAGE_SIZE = 640
 # LOAD MODEL
 print("Loading model...")
@@ -25,13 +25,11 @@ root = tk.Tk()
 root.withdraw()
 image_paths = filedialog.askopenfilenames(
     title="Select images to test",
-    filetypes=[
-        ("Image files", "*.jpg *.jpeg *.png *.bmp *.webp"),
+    filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.webp"),
         ("JPG files", "*.jpg"),
         ("PNG files", "*.png"),
-        ("All files", "*.*")
-    ]
-)
+        ("All files", "*.*")])
+
 if not image_paths:
     print("No images selected.")
     exit()
@@ -43,8 +41,7 @@ for image_path in image_paths:
     print("----------------------------------------")
     print("Image:", os.path.basename(image_path))
     # Run YOLO
-    results = model.predict(
-        source=image_path,
+    results = model.predict(source=image_path,
         conf=CONFIDENCE,
         imgsz=IMAGE_SIZE,
         verbose=False
@@ -64,29 +61,22 @@ for image_path in image_paths:
     # Draw detections
     for box in result.boxes:
         # Coordinates
-        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int)
+        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int) # YOLO stores the values in a tensor so we convert into int
         # Confidence
         confidence = float(box.conf[0])
         # Class
         class_id = int(box.cls[0])
         class_name = model.names[class_id]
         # Draw box
-        cv2.rectangle(
-            image,
-            (x1, y1),
-            (x2, y2),
-            (0, 255, 0),
-            2
-        )
+        cv2.rectangle(image,
+            (x1, y1),(x2, y2),
+            (0, 255, 0),2)
         # Label
         label = f"{class_name} {confidence:.2f}"
-        cv2.putText(
-            image,
-            label,
+        cv2.putText(image,label,
             (x1, max(25, y1 - 8)),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            (0, 255, 0),
+            0.6,(0, 255, 0),
             2
         )
     # Status
@@ -97,38 +87,28 @@ for image_path in image_paths:
         status = "CONVEYOR EMPTY"
         status_color = (0, 0, 255)
     # Status background
-    cv2.rectangle(
-        image,
-        (15, 15),
-        (500, 85),
+    cv2.rectangle(image,
+        (15, 15),(500, 85),
         (30, 30, 30),
         -1
     )
-    cv2.putText(
-        image,
-        status,
+    cv2.putText(image,status,
         (30, 62),
         cv2.FONT_HERSHEY_SIMPLEX,
         1.0,
         status_color,
-        3
-    )
+        3)
     # Detection count
-    cv2.putText(
-        image,
+    cv2.putText(image,
         f"Detected: {object_count}",
         (15, 115),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.7,
-        (255, 255, 255),
+        0.7,(255, 255, 255),
         2
     )
     # Display
     window_name = "YOLO Biscuit Detection"
-    cv2.imshow(
-        window_name,
-        image
-    )
+    cv2.imshow(window_name,image)
     print("Press:")
     print("  N = next image")
     print("  Q = quit")

@@ -114,17 +114,11 @@ csv_file = open(
     encoding="utf-8"
 )
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow([
-    "frame",
-    "track_id",
-    "center_x",
-    "center_y",
-    "confidence",
-    "state",
-    "line1_crossed",
-    "line2_crossed",
-    "counted"
-])
+csv_writer.writerow(["frame","track_id",
+    "center_x","center_y",
+    "confidence","state",
+    "line1_crossed","line2_crossed",
+    "counted"])
 # PROCESS VIDEO
 frame_number = 0
 while True:
@@ -262,7 +256,7 @@ while True:
     # DRAW ALL PERSISTENT DOTS
     # IMPORTANT:
     # We draw EVERY previously detected biscuit here.
-    # Therefore dots remain visible even when the biscuit
+    # Therefore, dots remain visible even when the biscuit
     # disappears from the current detection list.
     for saved_id, (dot_x, dot_y) in last_dot_positions.items():
         # GREEN = COUNTED

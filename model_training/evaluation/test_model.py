@@ -10,7 +10,7 @@ import config
 # CONFIGURATION (override MODEL_PATH / VIDEO_PATH in your .env)
 MODEL_PATH = config.MODEL_PATH
 VIDEO_PATH = config.VIDEO_PATH
-CONFIDENCE = 0.30
+CONFIDENCE = 0.50
 
 # LOAD MODEL
 model = YOLO(MODEL_PATH)
@@ -27,10 +27,7 @@ while True:
     if not ret:
         break
     # YOLO detection
-    results = model.predict(frame,
-        conf=CONFIDENCE,
-        verbose=False
-    )
+    results = model.predict(frame,conf=CONFIDENCE,verbose=False)
     # Draw detections
     annotated_frame = results[0].plot()
     # Number of detected biscuits
@@ -44,13 +41,10 @@ while True:
         f"Biscuits: {biscuit_count}",
         (20, 40),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0, 255, 0),
-        2
-    )
-    cv2.imshow("YOLO Biscuit Detection",
-        annotated_frame
-    )
+        1,(0, 255, 0),
+        2)
+    cv2.imshow("YOLO Biscuit Detection",annotated_frame)
+
     # Q = quit
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break

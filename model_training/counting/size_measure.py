@@ -1,6 +1,5 @@
 import sys # locate the shared config module
 from pathlib import Path
-
 from ultralytics import YOLO
 import cv2
 import csv
@@ -68,7 +67,6 @@ def check_size(width_px,height_px):
 print("=" * 70)
 print("HORIZONTAL BISCUIT SIZE + TWO-LINE TRACKING TEST")
 print("=" * 70)
-
 print("\nLoading YOLO model...")
 model = YOLO(MODEL_PATH)
 print("Model loaded successfully.")
@@ -103,8 +101,6 @@ if line1_y>=line2_y:
 print(f"\nLine 1 Y : {line1_y}")
 print(f"Line 2 Y : {line2_y}")
 print(f"Direction: {MOVEMENT_DIRECTION}")
-
-
 print("\n SIZE TEST")
 print(f"Standard width : {STANDARD_WIDTH_PX:.1f} px")
 print(f"Standard height : {STANDARD_HEIGHT_PX:.1f} px")
@@ -132,7 +128,6 @@ object_state={}
 size_width={}
 size_height={}
 
-
 accepted_ids=set()
 rejected_ids=set()
 final_size_measurements={}
@@ -151,7 +146,6 @@ while running:
     if not ret:
         break
     frame_number+=1
-
     results=model.track(frame,conf=CONFIDENCE,persist=True,tracker="bytetrack.yaml",verbose=False)
     result=results[0]
     annotated_frame=frame.copy()
@@ -166,7 +160,6 @@ while running:
              (width,line2_y),
              (0,0,255),
              3)
-
     cv2.line(annotated_frame,
              (0,line2_y),
              (width,line2_y),
@@ -216,7 +209,6 @@ while running:
         size_width[track_id].append(box_width)
         size_height[track_id].append(box_height)
 
-
         if len(size_width[track_id])>MAX_SIZE_MEASUREMENTS:
             size_width[track_id].pop(0)
 
@@ -237,7 +229,6 @@ while running:
 
             if movement> MAX_BACKWARD_MOVEMENT:
                 moving_forward=False
-
 
         crossed_line2=False
         if prev is not None and prev > line2_y >= center_y and moving_forward:
@@ -276,7 +267,6 @@ while running:
                 elif not final_size_ok:
                     print(f"[REJECTED SIZE Frame={frame_number} ID={track_id} SIZE= {final_width:.1f}x {final_height:.1f}")
 
-
         prev_y[track_id]=center_y
         if track_id in counted_ids:
             box_color=0,255,0
@@ -286,7 +276,6 @@ while running:
             box_color=255,255,0
         else:
             box_color=0,165,255
-
 
         cv2.rectangle(annotated_frame,
                       (x1,y2),
@@ -372,7 +361,6 @@ with open(SUMMARY_OUTPUT,"w",encoding="utf-8") as f:
     f.write(f"Accepted size IDs: {len(accepted_ids)}\n")
     f.write(f"Rejected size IDs: {len(rejected_ids)}\n")
     f.write(f"FINAL COUNT: {len(counted_ids)}\n\n")
-
 
     # COUNTED IDS
     f.write("COUNTED IDS:\n")

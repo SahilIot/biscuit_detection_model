@@ -126,9 +126,7 @@ while True:
         verbose=False
     )
     result = results[0]
-
     annotated_frame = frame.copy()
-
     cv2.line(annotated_frame,
         (0, line1_y),
         (frame_width, line1_y),
@@ -208,8 +206,7 @@ while True:
                 if track_id not in line2_crossed_ids:
                     line2_crossed_ids.add(track_id)
                     crossed_line2=True
-                    print(
-                        f"[LINE 2 SECOND] Frame={frame_number} ID={track_id}")
+                    print(f"[LINE 2 SECOND] Frame={frame_number} ID={track_id}")
 
                     if track_id not in counted_ids:
                         counted_ids.add(track_id)
@@ -363,7 +360,6 @@ with open(SUMMARY_OUTPUT, "w",encoding="utf-8") as f:
 
     for track_id in sorted(counted_ids):
         observations=track_observations.get(track_id,0)
-
         f.write(f"{track_id}: {observations}\n")
 
 

@@ -43,7 +43,6 @@ CSV_OUTPUT = os.path.join(OUTPUT_DIR,"vertical_tracking_log.csv")
 IDS_OUTPUT = os.path.join(OUTPUT_DIR,"vertical_counted_ids.txt")
 SUMMARY_OUTPUT = os.path.join(OUTPUT_DIR,"vertical_summary.txt")
 
-
 # START
 print("=" * 70)
 print("VERTICAL TWO-LINE BISCUIT TRACKING")
@@ -119,17 +118,11 @@ object_state = {}
 # CSV
 csv_file = open(CSV_OUTPUT,"w",newline="",encoding="utf-8")
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow([
-    "frame",
-    "track_id",
-    "center_x",
-    "center_y",
-    "confidence",
-    "state",
-    "line1_crossed",
-    "line2_crossed",
-    "counted"
-])
+csv_writer.writerow(["frame","track_id",
+    "center_x","center_y",
+    "confidence","state",
+    "line1_crossed","line2_crossed",
+    "counted"])
 
 # FRAME LOOP
 frame_number = 0
@@ -139,7 +132,6 @@ while running:
     if not ret:
         break
     frame_number += 1
-
     # YOLO + BYTE TRACK
     results = model.track(
         frame,

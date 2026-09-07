@@ -27,8 +27,7 @@ os.makedirs(TRAIN_LABELS, exist_ok=True)
 os.makedirs(VAL_LABELS, exist_ok=True)
 
 # FIND EMPTY-CONVEYOR IMAGES
-images = [
-    f for f in os.listdir(SOURCE_DIR)
+images = [f for f in os.listdir(SOURCE_DIR)
     if f.lower().endswith((".jpg", ".jpeg", ".png"))
 ]
 if not images:
@@ -61,10 +60,7 @@ def add_empty_images(image_list, image_destination, label_destination):
         label_name = os.path.splitext(new_name)[0] + ".txt"
         destination_label = os.path.join(label_destination,label_name)
         # Copy image
-        shutil.copy2(
-            source_image,
-            destination_image
-        )
+        shutil.copy2(source_image,destination_image)
         # Create EMPTY YOLO label
         # Empty conveyor = zero objects
         with open(destination_label,"w",encoding="utf-8"):

@@ -6,16 +6,7 @@ Central, machine-independent configuration for the whole biscuit
 detection pipeline (data prep -> labeling -> training -> fine-tuning
 -> evaluation -> counting -> live deployment).
 
-WHY THIS FILE EXISTS
----------------------
-The original scripts each hardcoded one person's local path, e.g.:
 
-    MODEL_PATH = r"C:\\Users\\Sahil\\Downloads\\WelcomeScreen\\runs\\detect\\..."
-
-That only works on one laptop. The moment a second person clones the
-repo, every script breaks (wrong OS, wrong username, wrong folder).
-
-Instead:
     - Shared folders (data/, models/, outputs/) are defined ONCE here,
       relative to the project root, so they work identically for
       everyone regardless of OS or username.
@@ -34,14 +25,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# ============================================================
+
 # PROJECT ROOT
-# ============================================================
 # This file lives at the project root, so its own folder IS the root.
 PROJECT_ROOT = Path(__file__).resolve().parent
 
 load_dotenv(PROJECT_ROOT / ".env")
-
 
 def _env_path(name: str, default_relative: str) -> str:
     """Read a path from the environment, falling back to a path
@@ -50,10 +39,7 @@ def _env_path(name: str, default_relative: str) -> str:
     value = os.getenv(name)
     return str(Path(value)) if value else str(PROJECT_ROOT / default_relative)
 
-
-# ============================================================
 # SHARED FOLDERS (same for everyone, created automatically)
-# ============================================================
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_VIDEOS_DIR = DATA_DIR / "videos"
 RAW_FRAMES_DIR = DATA_DIR / "raw_frames"
@@ -86,7 +72,7 @@ BASE_MODEL_PATH = _env_path("BASE_MODEL_PATH", "yolo26n.pt")
 VIDEO_PATH = _env_path("VIDEO_PATH", "data/videos/v1.mp4")
 
 
-# HIKVISION CAMERA (secrets -- keep these ONLY in your local .env)
+# HIK-VISION CAMERA (secrets -- keep these ONLY in your local .env)
 CAMERA_IP = os.getenv("CAMERA_IP", "YOUR_IP")
 CAMERA_USERNAME = os.getenv("CAMERA_USERNAME", "admin")
 CAMERA_PASSWORD = os.getenv("CAMERA_PASSWORD", "YOUR_PASSWORD")

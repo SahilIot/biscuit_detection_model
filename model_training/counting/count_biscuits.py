@@ -64,8 +64,7 @@ while True:
         print("End of video.")
         break
     frame_number += 1
-    results = model.track(
-        frame,
+    results = model.track(frame,
         conf=CONFIDENCE,
         persist=True,
         tracker="bytetrack.yaml",

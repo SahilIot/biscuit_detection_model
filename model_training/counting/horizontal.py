@@ -86,10 +86,8 @@ print(f"Direction    : {MOVEMENT_DIRECTION}")
 # VIDEO WRITER
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 writer = cv2.VideoWriter(VIDEO_OUTPUT,
-    fourcc,
-    fps,
-    (width, height)
-)
+    fourcc,fps,
+    (width, height))
 
 if not writer.isOpened():
     print("\nERROR: Could not create output video.")
@@ -118,19 +116,13 @@ observation_count = {}
 # Current state
 object_state = {}
 
-
 # CSV
 csv_file = open(CSV_OUTPUT,"w",newline="",encoding="utf-8")
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow([
-    "frame",
-    "track_id",
-    "center_x",
-    "center_y",
-    "confidence",
-    "state",
-    "line1_crossed",
-    "line2_crossed",
+csv_writer.writerow(["frame","track_id",
+    "center_x","center_y",
+    "confidence","state",
+    "line1_crossed","line2_crossed",
     "counted"
 ])
 
@@ -215,22 +207,17 @@ while running:
 
         # SAVE ID
         all_ids.add(track_id)
-
         # OBSERVATION COUNT
         observation_count[track_id] = observation_count.get(track_id,0) + 1
-
         # INITIAL STATE
         if track_id not in object_state:
             object_state[track_id] = "BEFORE_LINE_2"
-
         # PREVIOUS Y
         previous = previous_y.get(track_id)
-
         # MOVEMENT CHECK
         moving_forward = True
         if previous is not None:
             movement = center_y - previous
-
             # Positive movement means DOWN.
             # Since biscuits should move UP,
             # a large positive movement is suspicious.
@@ -257,7 +244,6 @@ while running:
                 object_state[track_id] = "AFTER_LINE_1"
                 crossed_line1 = True
                 print(f"[LINE 1] Frame={frame_number} ID={track_id}")
-
                 # COUNT
                 if track_id not in counted_ids:
                     counted_ids.add(track_id)

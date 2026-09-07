@@ -37,12 +37,9 @@ frame_number = 0
 present_counter = 0
 empty_counter = 0
 current_status = "INITIALIZING..."
-coverage_history = deque(
-    maxlen=HISTORY_LENGTH
-)
-object_history = deque(
-    maxlen=HISTORY_LENGTH
-)
+coverage_history = deque(maxlen=HISTORY_LENGTH)
+
+object_history = deque(maxlen=HISTORY_LENGTH)
 # Automatically learned biscuit shape
 learned_width = None
 learned_height = None
@@ -57,115 +54,64 @@ def robust_percentile(values, percentile, default):
     Safe percentile calculation.
     """
     values = np.asarray(values)
-    values = values[
-        np.isfinite(values)
-    ]
+    values = values[np.isfinite(values)]
     if len(values) == 0:
         return default
-    return float(
-        np.percentile(
-            values,
-            percentile
-        )
-    )
+    return float(np.percentile( values,percentile))
+
 # CREATE ADAPTIVE BISCUIT MASK
+#Create a binary mask showing where biscuits are likely to be , using color + texture without manually
+# specifying a fixed biscuit color
 def create_biscuit_mask(frame):
     # Resize for fast processing
-    small = cv2.resize(
-        frame,
+    # making the image smaller
+    small = cv2.resize(frame,
         None,
         fx=DETECTION_SCALE,
         fy=DETECTION_SCALE,
         interpolation=cv2.INTER_AREA
     )
     # LAB COLOR SPACE
-    lab = cv2.cvtColor(
-        small,
-        cv2.COLOR_BGR2LAB
-    )
-    L = lab[:, :, 0].astype(np.float32)
+    # convert BGR-LAB (Brightness , green<->red, blue <-> yellow
+
+    lab = cv2.cvtColor(small,cv2.COLOR_BGR2LAB)
+    # L = lab[:, :, 0].astype(np.float32)
     A = lab[:, :, 1].astype(np.float32)
     B = lab[:, :, 2].astype(np.float32)
     # CHROMA / WARMTH
     # We don't specify "biscuit = HSV X".
     # Instead we calculate the warm/cool difference
     # from the image itself.
-    warmth = B - A
-    warmth = cv2.GaussianBlur(
-        warmth,
-        (7, 7),
-        0
-    )
+    warmth = B - A # The intention is to emphasize areas that look warm/yellowish
+    warmth = cv2.GaussianBlur(warmth,(7, 7),0)
     # NORMALIZE WARMTH
-    warmth_norm = cv2.normalize(
-        warmth,
-        None,
-        0,
-        255,
-        cv2.NORM_MINMAX
-    ).astype(np.uint8)
+    warmth_norm = cv2.normalize(warmth,None,0,255,cv2.NORM_MINMAX).astype(np.uint8)
     # Automatic threshold
-    warmth_threshold, _ = cv2.threshold(
-        warmth_norm,
-        0,
-        255,
-        cv2.THRESH_BINARY + cv2.THRESH_OTSU
-    )
+    warmth_threshold, _ = cv2.threshold( warmth_norm,0,
+        255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)  # Tries to calculate a threshold automatically from the image
     # Prevent extreme threshold values
-    low_limit = np.percentile(
-        warmth_norm,
-        45
-    )
-    high_limit = np.percentile(
-        warmth_norm,
-        75
-    )
-    warmth_threshold = np.clip(
-        warmth_threshold,
-        low_limit,
-        high_limit
-    )
-    color_mask = (
-        warmth_norm >= warmth_threshold
-    ).astype(np.uint8) * 255
+    low_limit = np.percentile(warmth_norm,45)
+    high_limit = np.percentile( warmth_norm,75)
+    # Contained the threshold between low and high limit
+    warmth_threshold = np.clip(warmth_threshold,low_limit,high_limit)
+    #Create a black/white image
+    color_mask = (warmth_norm >= warmth_threshold).astype(np.uint8) * 255
     # LOCAL TEXTURE
     # Biscuits have embossed texture.
     # We calculate local standard deviation automatically.
-    gray = cv2.cvtColor(
-        small,
-        cv2.COLOR_BGR2GRAY
-    ).astype(np.float32)
-    local_mean = cv2.blur(
-        gray,
-        (11, 11)
-    )
-    local_mean_sq = cv2.blur(
-        gray * gray,
-        (11, 11)
-    )
-    local_std = np.sqrt(
-        np.maximum(
-            local_mean_sq -
-            local_mean * local_mean,
-            0
-        )
-    )
-    texture_norm = cv2.normalize(
-        local_std,
-        None,
-        0,
-        255,
-        cv2.NORM_MINMAX
-    ).astype(np.uint8)
-    texture_threshold = cv2.threshold(
-        texture_norm,
-        0,
-        255,
-        cv2.THRESH_BINARY + cv2.THRESH_OTSU
-    )[0]
-    texture_mask = (
-        texture_norm >= texture_threshold
-    ).astype(np.uint8) * 255
+    gray = cv2.cvtColor(small,cv2.COLOR_BGR2GRAY).astype(np.float32)
+
+    local_mean = cv2.blur(gray,(11, 11))
+
+    local_mean_sq = cv2.blur(gray * gray,(11, 11))
+
+    local_std = np.sqrt(np.maximum(local_mean_sq -local_mean * local_mean,0 ))
+
+    texture_norm = cv2.normalize(local_std,None,0,255,cv2.NORM_MINMAX ).astype(np.uint8)
+
+    texture_threshold = cv2.threshold(texture_norm,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[0]
+
+    texture_mask = (texture_norm >= texture_threshold).astype(np.uint8) * 255
     # COMBINE INFORMATION
     # Color is primary.
     # Texture is used to suppress some conveyor regions.
@@ -175,72 +121,45 @@ def create_biscuit_mask(frame):
     color_pixels = cv2.countNonZero(color_mask)
 
     combined_pixels = cv2.countNonZero(combined)
-    if (color_pixels > 0 and combined_pixels < color_pixels * 0.10):
+    if color_pixels > 0 and combined_pixels < color_pixels * 0.10:
         combined = color_mask
     # MORPHOLOGICAL CLEANUP
-    kernel_small = cv2.getStructuringElement(
-        cv2.MORPH_ELLIPSE,
-        (3, 3)
-    )
-    kernel_medium = cv2.getStructuringElement(
-        cv2.MORPH_ELLIPSE,
-        (5, 5)
-    )
-    combined = cv2.morphologyEx(
-        combined,
-        cv2.MORPH_OPEN,
-        kernel_small,
-        iterations=1
-    )
-    combined = cv2.morphologyEx(
-        combined,
-        cv2.MORPH_CLOSE,
-        kernel_medium,
-        iterations=2
-    )
+    kernel_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3, 3))
+
+    kernel_medium = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5, 5))
+
+    combined = cv2.morphologyEx(combined,cv2.MORPH_OPEN,kernel_small,iterations=1)
+
+    combined = cv2.morphologyEx(combined,cv2.MORPH_CLOSE,kernel_medium,iterations=2)
     # UPSCALE MASK
-    mask = cv2.resize(
-        combined,
-        (
-            frame.shape[1],
-            frame.shape[0]
-        ),
-        interpolation=cv2.INTER_NEAREST
-    )
+    mask = cv2.resize(combined,(
+            frame.shape[1],frame.shape[0]
+        ),interpolation=cv2.INTER_NEAREST)
     return mask
+
 # CLEAN COMPONENTS
 def clean_components(mask):
     num_labels, labels, stats, _ = (
-        cv2.connectedComponentsWithStats(
-            mask,
-            connectivity=8
-        )
-    )
+        cv2.connectedComponentsWithStats(mask,connectivity=8))
     clean = np.zeros_like(mask)
 
-    image_area = (
-        mask.shape[0] *
-        mask.shape[1]
-    )
+    image_area = (mask.shape[0] * mask.shape[1])
     # Automatically derive a minimum area
     # from the image size rather than a biscuit-specific
     # pixel count.
     minimum_area = image_area * 0.00015
     # Don't allow absurdly tiny values
-    minimum_area = max(
-        minimum_area,
-        30
-    )
+    minimum_area = max(minimum_area,30)
+
     for i in range(1,num_labels):
         area = stats[i,cv2.CC_STAT_AREA]
         if area >= minimum_area:
             clean[labels == i] = 255
     return clean
-# FIND CANDIDATES
 
+# FIND CANDIDATES
 def find_candidates(mask):
-    contours, _ = cv2.findContours(
-        mask,
+    contours, _ = cv2.findContours(mask,
         cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
@@ -279,18 +198,16 @@ def find_candidates(mask):
         # Very irregular regions
         if solidity < 0.35:
             continue
-        candidates.append({
-            "contour": contour,
+        candidates.append({"contour": contour,
             "area": area,
-            "x": x,
-            "y": y,
-            "w": w,
-            "h": h,
+            "x": x,"y": y,
+            "w": w,"h": h,
             "aspect": aspect,
             "rectangularity": rectangularity,
             "solidity": solidity
         })
     return candidates
+
 # LEARN TYPICAL BISCUIT SHAPE
 def learn_shape(candidates):
     global learned_width

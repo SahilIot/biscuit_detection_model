@@ -60,44 +60,48 @@ results = model.train(
     # CPU
     device="cpu",
     # REPRODUCIBILITY
-    seed=42,
+    seed=42, # Randomness control
     # DATA AUGMENTATION
-    degrees=5,
-    translate=0.05,
-    scale=0.20,
-    shear=2,
-    perspective=0.0005,
-    fliplr=0.5,
-    flipud=0.0,
-    hsv_h=0.015,
-    hsv_s=0.4,
-    hsv_v=0.25,
+    degrees=5, # Rotation of image +-5
+    translate=0.05, # image content to move approx. 5% horizontal/vertical
+    scale=0.20, # allows approx 20% scaling variation ( smaller,lager -> biscuit can appear)
+    shear=2, # slightly distorts the image geometrically
+    perspective=0.0005, # help if camera perspective changes slightly
+    fliplr=0.5, # 50% probability of flipping left<-> right
+    flipud=0.0, # no vertical flipping
+    #HSV augmentation
+    hsv_h=0.015, # small color shift
+    hsv_s=0.4, # can make colors more or less saturated
+    hsv_v=0.25, # changes brightness
     # MOSAIC
-    mosaic=0.5,
+    mosaic=0.5, # combines multiple training images into one
     close_mosaic=10,
-    # OPTIMIZER
 
-    optimizer="AdamW",
+    # OPTIMIZER
+    optimizer="AdamW", #optimization algorithm
     # LOW LEARNING RATE BECAUSE WE ARE FINE-TUNING
-    lr0=0.0005,
-    lrf=0.01,
-    weight_decay=0.0005,
-    warmup_epochs=2,
+    lr0=0.0005, #  this changes how aggressively the model changes its weights
+    lrf=0.01, # Controls the final learning rate relative to the initial learning rate
+    weight_decay=0.0005, # help reduce overfitting don`t let model become unnecessarily complicated
+    warmup_epochs=2, # for first 2 epochs , training starts more gently
+    # Epoch 1-> gentle start
+    # Epoch 2-> warmup
+    # Epoch 3 -> normal training
 
     # VALIDATION
-    val=True,
-    plots=True,
+    val=True, # evaluates the model on your validation dataset during training
+    plots=True, # generates training graphs,/results
 
     # OUTPUT
     project=str(config.RUNS_DIR),
     name="biscuit_v3",
     exist_ok=True,
     save=True,
-    save_period=10,
+    save_period=10, # save every 10 epochs
 
     # CPU WORKERS
     workers=0,
-    verbose=True
+    verbose=True # prints detailed training information - about epochs - losses, metrics etc
 )
 
 # FINISHED

@@ -1,38 +1,38 @@
-from ultralytics import YOLO
-import cv2
-from config import MODEL_PATH,VIDEO_PATH
+from ultralytics import YOLO #Load your model
+import cv2 # use for reading video,drawing lines,text, display video
+from config import MODEL_PATH,VIDEO_PATH # getting things from config file
 
-CONFIDENCE=0.30
-LINE_Y=100
+CONFIDENCE=0.30 # detection confidence
+LINE_Y=100 # vertical position of your horizontal counting line
 
-model=YOLO(MODEL_PATH)
+model=YOLO(MODEL_PATH) # load the model
 print("Model Loaded Successfully")
-cap=cv2.VideoCapture(VIDEO_PATH)
-if not cap.isOpened():
+cap=cv2.VideoCapture(VIDEO_PATH) # open the video
+if not cap.isOpened():  # cap is video reader
     print("Error: Could not open video")
     exit()
 print("Video Loaded Successfully")
 
 total_biscuits=0
 count_ids=set()
-prev_pos={}
+prev_pos={} # store prev-position of each tracked biscuit
 
-while True:
-    ret,frame =cap.read()
+while True: # Processing of video started
+    ret,frame =cap.read()  #ret - boolean indicating whether the frame was successfully read , frame - actual image
     if not ret:
         break
 
-    results=model.track(frame,conf=CONFIDENCE
-                        , persist=True,
-                        tracker="bytetrack.yaml",
-                        verbose=False)
+    results=model.track(frame,conf=CONFIDENCE  # detection + tracking
+                        , persist=True, # -> tells YOLO to maintain tracking information b/w frames
+                        tracker="bytetrack.yaml",  #-> is this biscuit in the current frame the same biscuit i saw in the prev-frame?
+                        verbose=False) # prevent from printing lots of information for every frame
     result=results[0]
     annotated_frame=result.plot()
     if result.boxes is not None and result.boxes.id is not None:
         boxes=result.boxes.xyxy.cpu().numpy()
         track_ids = result.boxes.id.cpu().numpy().astype(int)
 
-        for box , track_id in zip(boxes,track_ids):
+        for box ,track_id in zip(boxes,track_ids):
             x1,y1,x2,y2=box
 
             center_x=int((x1+x2)/2)

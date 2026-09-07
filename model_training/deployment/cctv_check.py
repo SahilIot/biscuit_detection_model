@@ -12,15 +12,14 @@ import config
 # hikvision + YOLO V2 LIVE TEST
 # 1. CAMERA SETTINGS
 # NEVER hardcode real credentials here -- set them in your local .env
-# (CAMERA_IP / CAMERA_USERNAME / CAMERA_PASSWORD), which is gitignored.
+# (CAMERA_IP / CAMERA_USERNAME / CAMERA_PASSWORD), which is gitignore.
 CAMERA_IP = config.CAMERA_IP
 USERNAME = config.CAMERA_USERNAME
 PASSWORD = config.CAMERA_PASSWORD
 ENCODED_USERNAME = quote(USERNAME, safe="")
 ENCODED_PASSWORD = quote(PASSWORD, safe="")
 # hikvision main stream
-RTSP_URL = (
-    f"rtsp://{ENCODED_USERNAME}:{ENCODED_PASSWORD}@"
+RTSP_URL = (f"rtsp://{ENCODED_USERNAME}:{ENCODED_PASSWORD}@"
     f"{CAMERA_IP}:554/Streaming/Channels/102"
 )
 # 2. YOLO MODEL (override MODEL_PATH in your .env)
@@ -50,10 +49,7 @@ print()
 def connect_camera():
     print("Connecting to hikvision...")
     # Hide password in console
-    safe_url = RTSP_URL.replace(
-        ENCODED_PASSWORD,
-        "********"
-    )
+    safe_url = RTSP_URL.replace(ENCODED_PASSWORD,"********")
     print(safe_url)
     camera = cv2.VideoCapture(RTSP_URL)
     if not camera.isOpened():
@@ -98,10 +94,7 @@ while True:
         if reconnect_attempts > MAX_RECONNECT_ATTEMPTS:
             print("ERROR: Maximum reconnect attempts reached.")
             break
-        print(f"Reconnecting... "
-            f"attempt {reconnect_attempts}/"
-            f"{MAX_RECONNECT_ATTEMPTS}"
-        )
+        print(f"Reconnecting... attempt {reconnect_attempts}/{MAX_RECONNECT_ATTEMPTS}")
         time.sleep(RECONNECT_DELAY)
         cap = connect_camera()
         if cap is None:
@@ -137,23 +130,14 @@ while True:
                     2
                 )
                 # Confidence label
-                label = (
-                    f"Biscuit "
-                    f"{confidence:.2f}"
-                )
-                cv2.putText(
-                    frame,
-                    label,
-                    (
-                        x1,
-                        max(y1 - 5, 20)
-                    ),
+                label = f"Biscuit {confidence:.2f}"
+                cv2.putText(frame,label,
+                    (x1,max(y1 - 5, 20)),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.45,
                     (0, 255, 0),
                     1,
-                    cv2.LINE_AA
-                )
+                    cv2.LINE_AA)
     # AVERAGE CONFIDENCE
     if confidences:
         average_confidence = (sum(confidences)/ len(confidences))
@@ -193,40 +177,23 @@ while True:
     cv2.rectangle(frame,(10, 10),(500, 150),(25, 25, 25),-1)
     cv2.putText(frame,current_status,(25, 50),cv2.FONT_HERSHEY_SIMPLEX,0.85,status_color, 2,cv2.LINE_AA)
     cv2.putText(frame,f"Biscuits: {biscuit_count}",(25, 82),cv2.FONT_HERSHEY_SIMPLEX,0.65,(255, 255, 255),2,cv2.LINE_AA)
-    cv2.putText(
-        frame,
+    cv2.putText(frame,
         f"Avg confidence: " f"{average_confidence:.2f}",
         (25, 112),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.60,
-        (255, 255, 255),
-        2,
-        cv2.LINE_AA
-    )
-    cv2.putText(
-        frame,
+        0.60,(255, 255, 255),
+        2,cv2.LINE_AA)
+    cv2.putText(frame,
         f"FPS: {display_fps:.1f}",
         (25, 140),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.60,
-        (255, 255, 255),
-        2,
-        cv2.LINE_AA
-    )
+        0.60,(255, 255, 255),
+        2,cv2.LINE_AA)
     # SHOW VIDEO
-    cv2.imshow(
-        "hikvision - Biscuit Detection",
-        frame
-    )
+    cv2.imshow("hikvision - Biscuit Detection",frame)
     # PRINT EVERY 30 FRAMES
     if frame_number % 30 == 0:
-        print(
-            f"Frame {frame_number} | "
-            f"Biscuits: {biscuit_count} | "
-            f"Avg conf: "
-            f"{average_confidence:.2f} | "
-            f"Status: {current_status}"
-        )
+        print(f"Frame {frame_number} | Biscuits: {biscuit_count} | Avg conf: {average_confidence:.2f} | Status: {current_status}")
     # QUIT
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

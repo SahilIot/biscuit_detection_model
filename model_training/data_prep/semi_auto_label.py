@@ -40,12 +40,7 @@ BISCUIT_CLASS_ID = 0
 TRAIN_PERCENT = 0.80
 
 # CREATE DIRECTORIES
-for directory in [
-    IMAGE_TRAIN_DIR,
-    IMAGE_VAL_DIR,
-    LABEL_TRAIN_DIR,
-    LABEL_VAL_DIR,
-]:
+for directory in [IMAGE_TRAIN_DIR,IMAGE_VAL_DIR,LABEL_TRAIN_DIR,LABEL_VAL_DIR,]:
     os.makedirs(directory, exist_ok=True)
 
 # GLOBAL GUI STATE
@@ -84,12 +79,8 @@ print("Prediction device:", YOLO_DEVICE)
 print()
 
 # GET RAW FRAME FILES
-image_extensions = (
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".bmp"
-)
+image_extensions = (".jpg",".jpeg",".png",".bmp")
+
 image_files = []
 for filename in os.listdir(RAW_FRAMES_DIR):
     if filename.lower().endswith(image_extensions):
@@ -112,30 +103,30 @@ print(f"Training images   : {train_count}")
 print(f"Validation images : "f"{total_images - train_count}")
 print()
 
-# IOU FUNCTION
-def box_iou(box1, box2):
-    x1, y1, x2, y2 = box1
-    a1, b1, a2, b2 = box2
-    inter_x1 = max(x1, a1)
-    inter_y1 = max(y1, b1)
-    inter_x2 = min(x2, a2)
-    inter_y2 = min(y2, b2)
-    iw = max(0,inter_x2 - inter_x1)
-    ih = max(0,inter_y2 - inter_y1)
-    intersection = iw * ih
-    area1 = (max(0, x2 - x1)*max(0, y2 - y1))
-    area2 = (max(0, a2 - a1)*max(0, b2 - b1))
-    union = (area1+area2-intersection)
-    if union <= 0:
-        return 0.0
-    return intersection / union
+# # IOU FUNCTION
+# def box_iou(box1, box2): # How much do these biscuit boxes overlap?
+#     x1, y1, x2, y2 = box1
+#     a1, b1, a2, b2 = box2
+#     inter_x1 = max(x1, a1)
+#     inter_y1 = max(y1, b1)
+#     inter_x2 = min(x2, a2)
+#     inter_y2 = min(y2, b2)
+#     # Cal. intersection width and height
+#     iw = max(0,inter_x2 - inter_x1)
+#     ih = max(0,inter_y2 - inter_y1)
+#     intersection = iw * ih # Cal intersection area
+#     area1 = (max(0, x2 - x1)*max(0, y2 - y1)) # Area of box 1 = w*h
+#     area2 = (max(0, a2 - a1)*max(0, b2 - b1)) # Area of box 2 = w*h
+#     union = (area1+area2-intersection)
+#     if union <= 0:
+#         return 0.0
+#     return intersection / union
 
 # YOLO PREDICTION
 
-def generate_yolo_candidates(image):
+def generate_yolo_candidates(image): # Check Where are the biscuits?
     candidates = []
-    results = model.predict(
-        source=image,
+    results = model.predict(source=image,
         conf=YOLO_CONFIDENCE,
         imgsz=YOLO_IMAGE_SIZE,
         device=YOLO_DEVICE,
@@ -146,14 +137,11 @@ def generate_yolo_candidates(image):
             continue
         if len(result.boxes) == 0:
             continue
-        boxes = result.boxes.xyxy.cpu().numpy()
+        boxes = result.boxes.xyxy.cpu().numpy() # Get the boundary boxes
         classes = result.boxes.cls.cpu().numpy()
         confidences = result.boxes.conf.cpu().numpy()
-        for box, class_id, confidence in zip(
-            boxes,
-            classes,
-            confidences
-        ):
+
+        for box, class_id, confidence in zip(boxes,classes,confidences):
             class_id = int(class_id)
             # Only keep biscuit class
             if class_id != BISCUIT_CLASS_ID:
@@ -285,13 +273,7 @@ def draw_interface():
     return canvas
 
 # MOUSE CALLBACK
-def mouse_callback(
-    event,
-    x,
-    y,
-    flags,
-    param
-):
+def mouse_callback(event,x,y,flags,param): # Left-Click+ drag -> draw a new biscuit box, Right-Click -> delete the nearest existing box
     global drawing
     global start_point
     global current_mouse
@@ -321,12 +303,7 @@ def mouse_callback(
         if width < 10 or height < 10:
             start_point = None
             return
-        new_box = (
-            left,
-            top,
-            right,
-            bottom
-        )
+        new_box = (left,top,right, bottom)
         # Prevent exact duplicate box
         if new_box not in current_boxes:
             current_boxes.append(new_box)
@@ -353,13 +330,12 @@ def mouse_callback(
             if best_distance < diagonal:
                 current_boxes.pop(best_index)
 
-
 # SAVE YOLO LABEL
 def save_yolo_label(label_path,boxes,image_width,image_height):
     with open(label_path, "w") as f:
-        for box in boxes:
-            x1, y1, x2, y2 = box
+        for x1,y1,x2,y2 in boxes:
             # Clamp coordinates
+            #Prevents a box from going outside the image
             x1 = max(0,min(image_width - 1, x1))
             x2 = max(0,min(image_width - 1,x2))
             y1 = max(0, min( image_height - 1,y1))
@@ -374,23 +350,13 @@ def save_yolo_label(label_path,boxes,image_width,image_height):
             nw = bw / image_width
             nh = bh / image_height
             # Class 0 = biscuit
-            f.write(
-                f"0 "
-                f"{cx:.6f} "
-                f"{cy:.6f} "
-                f"{nw:.6f} "
-                f"{nh:.6f}\n"
-            )
+            f.write(f"0 {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}\n")
 
 # CREATE DATASET YAML
 def create_data_yaml():
-    yaml_path = os.path.join(
-        OUTPUT_DIR,
-        "data.yaml"
-    )
-    absolute_dataset = os.path.abspath(
-        OUTPUT_DIR
-    ).replace("\\", "/")
+    yaml_path = os.path.join(OUTPUT_DIR,"data.yaml")
+    absolute_dataset = os.path.abspath(OUTPUT_DIR).replace("\\", "/")
+
     with open(yaml_path,"w") as f:
         f.write(f"path: {absolute_dataset}\n")
         f.write("train: images/train\n")
