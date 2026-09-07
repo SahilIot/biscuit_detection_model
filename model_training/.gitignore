@@ -30,7 +30,7 @@ runs/
 models/runs/
 
 # Generated outputs
-outputs/diagnostic_results
+outputs/diagnostic_results/*
 
 # Keep folder structure
 !outputs/.gitkeep
