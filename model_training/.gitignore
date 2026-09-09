@@ -1,8 +1,8 @@
-# Python
 __pycache__/
 *.py[cod]
 *.pyo
 
+# Virtual environments
 .venv/
 venv/
 env/
@@ -12,8 +12,8 @@ env/
 .vscode/
 
 # Environment / secrets
-
 .env
+*.env
 
 # Large video files
 *.mp4
@@ -24,14 +24,20 @@ env/
 # Large model files
 *.pt
 *.onnx
+*.engine
 
 # Training outputs
 runs/
 models/runs/
 
+# Test / CI generated files
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
 
-
-# Keep folder structure
+# Keep output folder structure
+!outputs/
 !outputs/.gitkeep
 !outputs/diagnostic_results/
 !outputs/diagnostic_results/.gitkeep
@@ -42,28 +48,35 @@ data/empty_frames/*
 data/videos/*
 
 # Keep folder structure
+!data/raw_frames/
 !data/raw_frames/.gitkeep
+
+!data/empty_frames/
 !data/empty_frames/.gitkeep
+
+!data/videos/
 !data/videos/.gitkeep
 
-
 # YOLO dataset images and labels
-# These are kept locally / in cloud storage, NOT GitHub
+# These stay locally / cloud storage, NOT GitHub
 data/biscuit_dataset/images/*
 data/biscuit_dataset/labels/*
 
 # Keep dataset directories
 !data/biscuit_dataset/images/
 !data/biscuit_dataset/labels/
+
 !data/biscuit_dataset/images/.gitkeep
 !data/biscuit_dataset/labels/.gitkeep
 
-
-# Keep YOLO dataset configuration in GitHub
+# YOLO dataset configuration
+# Keep this in GitHub
 !data/biscuit_dataset/data.yaml
 
 # Temporary / local files
 *.log
 *.tmp
+
+# OS files
 .DS_Store
 Thumbs.db

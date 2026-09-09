@@ -19,9 +19,7 @@ IMAGE_SIZE = 640
 BATCH_SIZE = 4
 # CHECK PATHS
 print()
-print("=" * 70)
 print("BISCUIT MODEL FINE-TUNING")
-print("=" * 70)
 print()
 if not os.path.exists(MODEL_PATH):
     print("ERROR: Existing model not found:")
@@ -46,9 +44,7 @@ print("Model loaded successfully.")
 print()
 
 # FINE-TUNING
-print("=" * 70)
 print("STARTING FINE-TUNING")
-print("=" * 70)
 print()
 results = model.train(
     # DATASET
@@ -106,9 +102,7 @@ results = model.train(
 
 # FINISHED
 print()
-print("=" * 70)
 print("FINE-TUNING COMPLETE")
-print("=" * 70)
 print()
 
 print("New model:")
