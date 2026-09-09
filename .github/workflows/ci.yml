@@ -45,4 +45,4 @@ jobs:
 
       - name: Run tests
         working-directory: model_training
-        run: pytest
+        run: pytest tests
