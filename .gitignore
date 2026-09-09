@@ -12,7 +12,7 @@ env/
 .vscode/
 
 # Environment / secrets
-.env
+model_training/.env
 *.env
 
 # Large video files
