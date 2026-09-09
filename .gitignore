@@ -1,3 +1,8 @@
+
+.idea/
+.vscode/
+
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -7,28 +12,29 @@ __pycache__/
 venv/
 env/
 
-# IDE
-.idea/
-.vscode/
-
 # Environment / secrets
-model_training/.env
+
+.env
 *.env
 
 # Large video files
+
 *.mp4
 *.avi
 *.mov
 *.mkv
 
 # Large model files
+
 *.pt
 *.onnx
 *.engine
 
 # Training outputs
 runs/
-models/runs/
+model_training/runs/
+model_training/models/runs/
+
 
 # Test / CI generated files
 .pytest_cache/
@@ -36,47 +42,49 @@ models/runs/
 htmlcov/
 coverage.xml
 
-# Keep output folder structure
-!outputs/
-!outputs/.gitkeep
-!outputs/diagnostic_results/
-!outputs/diagnostic_results/.gitkeep
+# Local raw frames
+model_training/data/raw_frames/*
+model_training/data/empty_frames/*
+model_training/data/videos/*
 
-# Local datasets / raw data
-data/raw_frames/*
-data/empty_frames/*
-data/videos/*
+# Keep the directories
+!model_training/data/raw_frames/
+!model_training/data/empty_frames/
+!model_training/data/videos/
 
-# Keep folder structure
-!data/raw_frames/
-!data/raw_frames/.gitkeep
+# Keep .gitkeep files
+!model_training/data/raw_frames/.gitkeep
+!model_training/data/empty_frames/.gitkeep
+!model_training/data/videos/.gitkeep
 
-!data/empty_frames/
-!data/empty_frames/.gitkeep
+# YOLO dataset
 
-!data/videos/
-!data/videos/.gitkeep
+model_training/data/biscuit_dataset/images/*
+model_training/data/biscuit_dataset/labels/*
 
-# YOLO dataset images and labels
-# These stay locally / cloud storage, NOT GitHub
-data/biscuit_dataset/images/*
-data/biscuit_dataset/labels/*
+# Keep directories
+!model_training/data/biscuit_dataset/images/
+!model_training/data/biscuit_dataset/labels/
 
-# Keep dataset directories
-!data/biscuit_dataset/images/
-!data/biscuit_dataset/labels/
+# Keep .gitkeep
+!model_training/data/biscuit_dataset/images/.gitkeep
+!model_training/data/biscuit_dataset/labels/.gitkeep
 
-!data/biscuit_dataset/images/.gitkeep
-!data/biscuit_dataset/labels/.gitkeep
+# Keep dataset configuration
+!model_training/data/biscuit_dataset/data.yaml
 
-# YOLO dataset configuration
-# Keep this in GitHub
-!data/biscuit_dataset/data.yaml
+# Outputs
+model_training/outputs/*
 
-# Temporary / local files
+# Keep output structure
+!model_training/outputs/
+!model_training/outputs/.gitkeep
+!model_training/outputs/diagnostic_results/
+!model_training/outputs/diagnostic_results/.gitkeep
+
+# Temporary / OS files
+
 *.log
 *.tmp
-
-# OS files
 .DS_Store
 Thumbs.db
