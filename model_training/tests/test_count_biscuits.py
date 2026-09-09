@@ -1,4 +1,4 @@
-from counting.count_biscuit import BiscuitCounter
+from counting.count_biscuits import BiscuitCounter
 def test_one_biscuit_is_counted_once():
     counter = BiscuitCounter()
     # Frame 1: biscuit appears.
