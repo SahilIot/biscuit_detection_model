@@ -41,7 +41,7 @@ jobs:
 
       - name: Check imports
         working-directory: model_training
-        run: python -c "import cv2; import numpy; import dotenv; import ultraytics"
+        run: python -c "import cv2; import numpy; import dotenv; import ultralytics"
 
       - name: Run tests
         working-directory: model_training
