@@ -38,14 +38,12 @@ print(f"{len(image_paths)} image(s) selected.")
 print()
 # PROCESS IMAGES
 for image_path in image_paths:
-    print("----------------------------------------")
     print("Image:", os.path.basename(image_path))
     # Run YOLO
     results = model.predict(source=image_path,
         conf=CONFIDENCE,
         imgsz=IMAGE_SIZE,
-        verbose=False
-    )
+        verbose=False)
     result = results[0]
     # Original image
     image = cv2.imread(image_path)
@@ -68,8 +66,7 @@ for image_path in image_paths:
         class_id = int(box.cls[0])
         class_name = model.names[class_id]
         # Draw box
-        cv2.rectangle(image,
-            (x1, y1),(x2, y2),
+        cv2.rectangle(image,(x1, y1),(x2, y2),
             (0, 255, 0),2)
         # Label
         label = f"{class_name} {confidence:.2f}"
@@ -77,8 +74,7 @@ for image_path in image_paths:
             (x1, max(25, y1 - 8)),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.6,(0, 255, 0),
-            2
-        )
+            2)
     # Status
     if object_count > 0:
         status = "BISCUITS PRESENT"
@@ -99,8 +95,7 @@ for image_path in image_paths:
         status_color,
         3)
     # Detection count
-    cv2.putText(image,
-        f"Detected: {object_count}",
+    cv2.putText(image,f"Detected: {object_count}",
         (15, 115),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.7,(255, 255, 255),

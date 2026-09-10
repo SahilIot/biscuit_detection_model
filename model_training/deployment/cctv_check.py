@@ -1,6 +1,5 @@
 import sys # locate the shared config module
 from pathlib import Path
-
 import cv2
 import time
 from urllib.parse import quote
@@ -35,9 +34,7 @@ MAX_RECONNECT_ATTEMPTS = 5
 # Delay between reconnect attempts
 RECONNECT_DELAY = 2
 # 4. LOAD MODEL
-print("=" * 60)
 print("hikvision + YOLO V2 LIVE TEST")
-print("=" * 60)
 print()
 print("Loading model:")
 print(MODEL_PATH)
@@ -201,6 +198,4 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 print()
-print("=" * 60)
 print("CAMERA TEST FINISHED")
-print("=" * 60)

@@ -1,9 +1,7 @@
 import sys # locate the shared config module
 from pathlib import Path
-
 from ultralytics import YOLO
 import cv2
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config
 

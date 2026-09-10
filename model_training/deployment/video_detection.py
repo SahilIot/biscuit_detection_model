@@ -50,9 +50,7 @@ last_time = time.perf_counter()
 
 # UTILITY
 def robust_percentile(values, percentile, default):
-    """
-    Safe percentile calculation.
-    """
+
     values = np.asarray(values)
     values = values[np.isfinite(values)]
     if len(values) == 0:
@@ -100,17 +98,11 @@ def create_biscuit_mask(frame):
     # Biscuits have embossed texture.
     # We calculate local standard deviation automatically.
     gray = cv2.cvtColor(small,cv2.COLOR_BGR2GRAY).astype(np.float32)
-
     local_mean = cv2.blur(gray,(11, 11))
-
     local_mean_sq = cv2.blur(gray * gray,(11, 11))
-
     local_std = np.sqrt(np.maximum(local_mean_sq -local_mean * local_mean,0 ))
-
     texture_norm = cv2.normalize(local_std,None,0,255,cv2.NORM_MINMAX ).astype(np.uint8)
-
     texture_threshold = cv2.threshold(texture_norm,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[0]
-
     texture_mask = (texture_norm >= texture_threshold).astype(np.uint8) * 255
     # COMBINE INFORMATION
     # Color is primary.
@@ -125,11 +117,8 @@ def create_biscuit_mask(frame):
         combined = color_mask
     # MORPHOLOGICAL CLEANUP
     kernel_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3, 3))
-
     kernel_medium = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5, 5))
-
     combined = cv2.morphologyEx(combined,cv2.MORPH_OPEN,kernel_small,iterations=1)
-
     combined = cv2.morphologyEx(combined,cv2.MORPH_CLOSE,kernel_medium,iterations=2)
     # UPSCALE MASK
     mask = cv2.resize(combined,(
@@ -142,7 +131,6 @@ def clean_components(mask):
     num_labels, labels, stats, _ = (
         cv2.connectedComponentsWithStats(mask,connectivity=8))
     clean = np.zeros_like(mask)
-
     image_area = (mask.shape[0] * mask.shape[1])
     # Automatically derive a minimum area
     # from the image size rather than a biscuit-specific
@@ -255,11 +243,7 @@ def filter_candidates(candidates):
         height_ratio = (c["h"] /max(learned_height, 1))
         aspect_difference = abs(c["aspect"] -learned_aspect)
         # Accept a broad range.
-        if (0.25 <= width_ratio <= 4.0 and 0.25 <= height_ratio <= 4.0 and aspect_difference <= max(
-                learned_aspect * 0.8,
-                1.0
-            )
-        ):
+        if 0.25 <= width_ratio <= 4.0 and 0.25 <= height_ratio <= 4.0 and aspect_difference <= max(learned_aspect * 0.8,1.0):
             good.append(c)
     return good
 # CALCULATE OCCUPANCY
@@ -289,14 +273,14 @@ def update_status(occupancy,candidate_count):
     if present:
         present_counter += 1
         empty_counter = 0
-        if (present_counter >=  PRESENT_FRAMES_REQUIRED):
-            current_status = ("BISCUITS PRESENT")
+        if present_counter >=  PRESENT_FRAMES_REQUIRED:
+            current_status = "BISCUITS PRESENT"
     else:
         empty_counter += 1
         present_counter = 0
-        if (empty_counter >=EMPTY_FRAMES_REQUIRED):
-            current_status = ("CONVEYOR EMPTY")
-    return (average_coverage,average_objects)
+        if empty_counter >=EMPTY_FRAMES_REQUIRED:
+            current_status = "CONVEYOR EMPTY"
+    return average_coverage,average_objects
 
 # DRAW
 def draw_detection(frame,candidates,average_coverage, average_objects,fps):
@@ -388,7 +372,7 @@ def draw_detection(frame,candidates,average_coverage, average_objects,fps):
     if learned_width is not None:
         cv2.putText(
             frame,
-            (f"Learned shape: "f"{learned_width:.0f}x"f"{learned_height:.0f}"),
+            f"Learned shape: "f"{learned_width:.0f}x"f"{learned_height:.0f}",
             (15, 225),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.55,
@@ -412,7 +396,7 @@ while True:
     # Candidate detection
     candidates = find_candidates(clean_mask)
     # Learn shape periodically
-    if (frame_number == 1 or frame_number % MODEL_UPDATE_INTERVAL == 0):
+    if frame_number == 1 or frame_number % MODEL_UPDATE_INTERVAL == 0:
         learn_shape(candidates)
     # Apply learned shape
     filtered_candidates = (filter_candidates(candidates))
