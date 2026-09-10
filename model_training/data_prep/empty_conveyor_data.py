@@ -28,8 +28,8 @@ os.makedirs(VAL_LABELS, exist_ok=True)
 
 # FIND EMPTY-CONVEYOR IMAGES
 images = [f for f in os.listdir(SOURCE_DIR)
-    if f.lower().endswith((".jpg", ".jpeg", ".png"))
-]
+    if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+
 if not images:
     print("ERROR: No images found in:")
     print(SOURCE_DIR)
@@ -41,9 +41,7 @@ random.shuffle(images)
 split_index = int(len(images) * TRAIN_RATIO)
 train_images = images[:split_index]
 val_images = images[split_index:]
-print("=" * 60)
 print("EMPTY CONVEYOR DATASET")
-print("=" * 60)
 print(f"Total empty images : {len(images)}")
 print(f"Train              : {len(train_images)}")
 print(f"Validation         : {len(val_images)}")
@@ -76,9 +74,7 @@ print("Adding validation images...")
 add_empty_images(val_images,VAL_IMAGES,VAL_LABELS)
 # FINISHED
 print()
-print("=" * 60)
 print("EMPTY DATA ADDED SUCCESSFULLY")
-print("=" * 60)
 print(f"Training empty images   : {len(train_images)}")
 print(f"Validation empty images : {len(val_images)}")
 print()

@@ -53,9 +53,7 @@ current_mouse = (0, 0)
 
 # LOAD YOLO MODEL
 print()
-print("=" * 65)
 print("YOLO SEMI-AUTOMATIC BISCUIT LABELING")
-print("=" * 65)
 print()
 if not os.path.exists(MODEL_PATH):
     print("ERROR: YOLO model not found:")
@@ -103,26 +101,6 @@ print(f"Training images   : {train_count}")
 print(f"Validation images : "f"{total_images - train_count}")
 print()
 
-# # IOU FUNCTION
-# def box_iou(box1, box2): # How much do these biscuit boxes overlap?
-#     x1, y1, x2, y2 = box1
-#     a1, b1, a2, b2 = box2
-#     inter_x1 = max(x1, a1)
-#     inter_y1 = max(y1, b1)
-#     inter_x2 = min(x2, a2)
-#     inter_y2 = min(y2, b2)
-#     # Cal. intersection width and height
-#     iw = max(0,inter_x2 - inter_x1)
-#     ih = max(0,inter_y2 - inter_y1)
-#     intersection = iw * ih # Cal intersection area
-#     area1 = (max(0, x2 - x1)*max(0, y2 - y1)) # Area of box 1 = w*h
-#     area2 = (max(0, a2 - a1)*max(0, b2 - b1)) # Area of box 2 = w*h
-#     union = (area1+area2-intersection)
-#     if union <= 0:
-#         return 0.0
-#     return intersection / union
-
-# YOLO PREDICTION
 
 def generate_yolo_candidates(image): # Check Where are the biscuits?
     candidates = []
@@ -151,12 +129,7 @@ def generate_yolo_candidates(image): # Check Where are the biscuits?
             y1 = int(round(y1))
             x2 = int(round(x2))
             y2 = int(round(y2))
-            candidates.append(
-                {
-                    "box": (x1, y1, x2, y2),
-                    "confidence": float(confidence)
-                }
-            )
+            candidates.append( {"box": (x1, y1, x2, y2),"confidence": float(confidence)})
     return candidates
 
 # DRAW GUI
@@ -176,15 +149,12 @@ def draw_interface():
         if box in current_boxes:
             continue
         x1, y1, x2, y2 = box
-        cv2.rectangle(
-            canvas,
-            (x1, y1),
-            (x2, y2),
+        cv2.rectangle(canvas,
+            (x1, y1),(x2, y2),
             (0, 165, 255),
             2
         )
-        cv2.putText(
-            canvas,
+        cv2.putText(canvas,
             f"YOLO {confidence:.2f}",
             (x1, max(15, y1 - 5)),
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -197,15 +167,12 @@ def draw_interface():
     # Green
     for i, box in enumerate(current_boxes):
         x1, y1, x2, y2 = box
-        cv2.rectangle(
-            canvas,
-            (x1, y1),
-            (x2, y2),
+        cv2.rectangle(canvas,
+            (x1, y1),(x2, y2),
             (0, 255, 0),
             2
         )
-        cv2.putText(
-            canvas,
+        cv2.putText(canvas,
             str(i + 1),
             (x1, max(15, y1 - 5)),
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -220,28 +187,20 @@ def draw_interface():
     if drawing and start_point is not None:
         x1, y1 = start_point
         x2, y2 = current_mouse
-        cv2.rectangle(
-            canvas,
-            (x1, y1),
-            (x2, y2),
+        cv2.rectangle(canvas,
+            (x1, y1),(x2, y2),
             (255, 0, 0),
             2
         )
-
     # Header
     header_height = 85
-    cv2.rectangle(
-        canvas,
+    cv2.rectangle(canvas,
         (0, 0),
-        (
-            canvas.shape[1],
-            header_height
-        ),
+        (canvas.shape[1],header_height),
         (25, 25, 25),
         -1
     )
-    cv2.putText(
-        canvas,
+    cv2.putText(canvas,
         "A=Accept YOLO | R=Reject All | S=Skip | ENTER=Save | ESC=Quit",
         (10, 25),
         cv2.FONT_HERSHEY_SIMPLEX,
@@ -250,8 +209,7 @@ def draw_interface():
         1,
         cv2.LINE_AA
     )
-    cv2.putText(
-        canvas,
+    cv2.putText(canvas,
         "LEFT DRAG = Add Box | RIGHT CLICK = Delete Box",
         (10, 50),
         cv2.FONT_HERSHEY_SIMPLEX,
@@ -260,8 +218,7 @@ def draw_interface():
         1,
         cv2.LINE_AA
     )
-    cv2.putText(
-        canvas,
+    cv2.putText( canvas,
         f"Accepted boxes: {len(current_boxes)}",
         (10, 75),
         cv2.FONT_HERSHEY_SIMPLEX,
@@ -372,9 +329,7 @@ cv2.setMouseCallback("Biscuit Labeling",mouse_callback)
 saved_count = 0
 skipped_count = 0
 print()
-print("=" * 65)
 print("STARTING LABELING")
-print("=" * 65)
 print()
 print("Instructions:")
 print()
@@ -395,7 +350,6 @@ print()
 for frame_index, image_path in enumerate(image_files):
     filename = os.path.basename(image_path)
     print()
-    print("=" * 65)
     print(f"Frame {frame_index + 1}/"f"{total_images}")
     print(f"File: {filename}")
     # Read image
@@ -492,9 +446,7 @@ cv2.destroyAllWindows()
 yaml_path = create_data_yaml()
 # FINAL SUMMARY
 print()
-print("=" * 65)
 print("LABELING COMPLETE")
-print("=" * 65)
 print()
 print(f"Total source frames : "f"{total_images}")
 print(f"Saved frames        : "f"{saved_count}")
@@ -506,9 +458,7 @@ print()
 print("data.yaml:")
 print(yaml_path)
 print()
-print("=" * 65)
 print("NEXT STEP")
-print("=" * 65)
 print()
 print("Run your finetune.py")
 print()
