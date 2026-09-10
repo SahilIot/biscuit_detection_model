@@ -56,6 +56,10 @@ PLC Integration
 
 
 model_training/
+|
+├──.github
+|     └──workflows
+|      └──ci.yml
 │
 ├── archive/
 │   └── test_biscuit.py
@@ -107,6 +111,9 @@ model_training/
 │
 ├── outputs/
 │   └── diagnostic_results/
+|── test/
+|      └──test_config.py
+|      └──test_count_biscuits.py
 │
 ├── training/
 │   ├── fine_tuning.py
