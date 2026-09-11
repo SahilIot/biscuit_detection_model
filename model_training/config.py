@@ -1,35 +1,11 @@
-"""
-config.py
-=========
-
-Central, machine-independent configuration for the whole biscuit
-detection pipeline (data prep -> labeling -> training -> fine-tuning
--> evaluation -> counting -> live deployment).
-
-
-    - Shared folders (data/, models/, outputs/) are defined ONCE here,
-      relative to the project root, so they work identically for
-      everyone regardless of OS or username.
-    - Anything that's genuinely personal or secret (which video file
-      you're testing with locally, camera IP/credentials) is read
-      from a local ".env" file that is NEVER committed to git
-      (see .gitignore). Copy .env to .env and fill in your
-      own values.
-
-Every script in this repo should import its paths from here instead
-of hardcoding them.
-"""
-
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 # PROJECT ROOT
 # This file lives at the project root, so its own folder IS the root.
 PROJECT_ROOT = Path(__file__).resolve().parent
-
 load_dotenv(PROJECT_ROOT / ".env")
 
 def _env_path(name: str, default_relative: str) -> str:
@@ -55,7 +31,6 @@ RUNS_DIR = PROJECT_ROOT / "runs" / "detect"
 
 for _folder in (RAW_VIDEOS_DIR,RAW_FRAMES_DIR,EMPTY_FRAMES_DIR, MODELS_DIR,DIAGNOSTIC_DIR,):
     _folder.mkdir(parents=True, exist_ok=True)
-
 # MODEL WEIGHTS
 # Whatever YOLO weights you personally want scripts to use by
 # default. Override per-machine in .env, e.g.:
@@ -70,7 +45,6 @@ BASE_MODEL_PATH = _env_path("BASE_MODEL_PATH", "yolo26n.pt")
 # Default local test video. Override in .env per machine, e.g.:
 #   VIDEO_PATH=C:\Users\you\Videos\testing_video.mp4
 VIDEO_PATH = _env_path("VIDEO_PATH", "data/videos/v1.mp4")
-
 
 # HIK-VISION CAMERA (secrets -- keep these ONLY in your local .env)
 CAMERA_IP = os.getenv("CAMERA_IP", "YOUR_IP")
