@@ -1,4 +1,4 @@
-#AI Code Review Rules
+##AI Code Review Rules
 
 ## General
 
